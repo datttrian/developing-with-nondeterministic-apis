@@ -14,26 +14,6 @@ client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
 )
 
-query_type = """
-{
-    "sentiment_analysis": "Analyze the sentiment of the provided text. Determine whether the sentiment is positive, negative, or neutral and provide a confidence score.",
-    "text_summarization": "Summarize the provided text into a concise version, capturing the key points and main ideas."
-}
-"""
-
-JSON_schema = """
-"sentiment_analysis": {
-    "sentiment": "string (positive, negative, neutral)",
-    "confidence_score": "number (0-1)",
-    "text_snippets": "array of strings (specific text portions contributing to sentiment)"
-},
-"text_summarization": {
-    "summary": "string",
-    "key_points": "array of strings (main points summarized)",
-    "length": "number (number of words in summary)"
-}
-"""
-
 from openai import OpenAI
 
 client = OpenAI()
@@ -45,21 +25,46 @@ def generate_completion(client, prompt):
         temperature=1,
         top_p=1,
         seed=42,
-        response_format={"type": "json_object"},
         messages=[
-            {
-                "role": "system",
-                "content": f"You are a data analysis assistant capable of {query_type} analysis. Respond with your analysis in JSON format. The JSON schema should include '{JSON_schema}'.",
-            },
+            {"role": "system", "content": f"You are a helpful assistant."},
             {"role": "user", "content": prompt},
         ],
+        tools=[
+            {
+                "type": "function",
+                "function": {
+                    "name": "get_current_weather",
+                    "description": "Get the current weather in a given location",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "location": {
+                                "type": "string",
+                                "description": "The city and state, e.g. San Francisco, CA",
+                            },
+                            "unit": {
+                                "type": "string",
+                                "enum": ["celsius", "fahrenheit"],
+                            },
+                        },
+                        "required": ["location", "unit"],
+                    },
+                },
+            }
+        ],
+        tool_choice="auto",
     )
     print("Message: \n" + str(completion.choices[0].message.content))
+    print(
+        "Function name: \n"
+        + str(completion.choices[0].message.tool_calls[0].function.name)
+    )
+    print(
+        "Function arguments: \n"
+        + str(completion.choices[0].message.tool_calls[0].function.arguments)
+    )
 
 
 # repeat generate_completion() five times
 for i in range(5):
-    generate_completion(
-        client,
-        f"Evaluate this customer feedback: The ducks did not seem to enjoy being hugged.",
-    )
+    generate_completion(client, f"What's the weather like in Burnaby?")
