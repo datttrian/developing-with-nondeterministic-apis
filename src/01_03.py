@@ -26,7 +26,7 @@ def generate_completion(client, prompt):
             {
                 "role": "system",
                 # "content": f"You're a sentiment analyst. Analyze the sentiment of the provided statement.",
-                "content": f"You're a sentiment analyst. Analyze the sentiment of the provided statement and give it a classification of positive, neutral, or negative.",
+                "content": f"You're a sentiment analyst. Analyze the sentiment of the provided statement and give it a classification of positive, neutral, or negative. Give me only the classification, nothing else.",
             },
             {"role": "user", "content": prompt},
         ],
@@ -36,4 +36,6 @@ def generate_completion(client, prompt):
 
 # repeat generate_completion() five times
 for i in range(5):
-    generate_completion(client, f"Look at the broad wingspan of this duck!")
+    generate_completion(
+        client, f"The feet on this duck are too big. Rate it from 1 - 5."
+    )
