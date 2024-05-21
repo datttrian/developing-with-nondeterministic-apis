@@ -65,4 +65,4 @@ def generate_completion(client, prompt):
 
 # repeat generate_completion() five times
 for i in range(5):
-    generate_completion(client, f"Write a haiku about a duck.")
+    generate_completion(client, f"Array of ten random numbers. Just the array.")
