@@ -14,36 +14,24 @@ client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
 )
 
-feedback_template = """
-# Park Experience
-## Positive Feedback:
-"Thank you for your wonderful feedback; we're thrilled you enjoyed your visit and look forward to welcoming you back for more fun!"
+query_type = """
+{
+    "sentiment_analysis": "Analyze the sentiment of the provided text. Determine whether the sentiment is positive, negative, or neutral and provide a confidence score.",
+    "text_summarization": "Summarize the provided text into a concise version, capturing the key points and main ideas."
+}
+"""
 
-## Neutral Feedback:
-"Thank you for visiting and sharing your thoughts; we're always striving to improve and value your suggestions!"
-
-## Negative Feedback:
-"We're sorry to hear about your disappointing experience and would appreciate more details to help us make necessary improvements."
-
-# Food
-## Positive Feedback:
-"Thank you for your kind words about our food; our culinary team is delighted you enjoyed your meal and can't wait to serve you again!"
-
-## Neutral Feedback:
-"We appreciate your feedback on our food and are always looking to expand and improve our menu based on guest suggestions."
-
-## Negative Feedback:
-"We apologize for not meeting your expectations with our food and would value more specific feedback to help us enhance our offerings."
-
-# The Ducks
-## Positive Feedback:
-"We're so glad you enjoyed the ducks; they are a central part of our park's charm and we love sharing them with our visitors!"
-
-## Neutral Feedback:
-"Thank you for your feedback on the ducks; we're always looking for ways to improve our guests' experiences with our feathered stars."
-
-## Negative Feedback:
-"We regret that your experience with the ducks wasn't as expected and would greatly appreciate more details to help us improve in this area."
+JSON_schema = """
+"sentiment_analysis": {
+    "sentiment": "string (positive, negative, neutral)",
+    "confidence_score": "number (0-1)",
+    "text_snippets": "array of strings (specific text portions contributing to sentiment)"
+},
+"text_summarization": {
+    "summary": "string",
+    "key_points": "array of strings (main points summarized)",
+    "length": "number (number of words in summary)"
+}
 """
 
 from openai import OpenAI
@@ -59,7 +47,10 @@ def generate_completion(client, prompt):
         seed=42,
         response_format={"type": "json_object"},
         messages=[
-            {"role": "system", "content": f"You are a helpful assistant. respond with a JSON object."},
+            {
+                "role": "system",
+                "content": f"You are a data analysis assistant capable of {query_type} analysis. Respond with your analysis in JSON format. The JSON schema should include '{JSON_schema}'.",
+            },
             {"role": "user", "content": prompt},
         ],
     )
@@ -70,6 +61,5 @@ def generate_completion(client, prompt):
 for i in range(5):
     generate_completion(
         client,
-        f"Write a haiku about a duck .",
-        # client, f"Array of ten random numbers. Just the array."
+        f"Evaluate this customer feedback: The ducks did not seem to enjoy being hugged.",
     )
