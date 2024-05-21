@@ -56,6 +56,7 @@ def generate_completion(client, prompt):
         model="gpt-4-turbo-preview",
         temperature=1,
         top_p=1,
+        seed=42,
         messages=[
             {"role": "system", "content": f"You are a helpful assistant."},
             {"role": "user", "content": prompt},
