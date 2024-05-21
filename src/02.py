@@ -57,8 +57,9 @@ def generate_completion(client, prompt):
         temperature=1,
         top_p=1,
         seed=42,
+        response_format={"type": "json_object"},
         messages=[
-            {"role": "system", "content": f"You are a helpful assistant."},
+            {"role": "system", "content": f"You are a helpful assistant. respond with a JSON object."},
             {"role": "user", "content": prompt},
         ],
     )
@@ -67,4 +68,8 @@ def generate_completion(client, prompt):
 
 # repeat generate_completion() five times
 for i in range(5):
-    generate_completion(client, f"Array of ten random numbers. Just the array.")
+    generate_completion(
+        client,
+        f"Write a haiku about a duck .",
+        # client, f"Array of ten random numbers. Just the array."
+    )
