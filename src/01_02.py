@@ -45,5 +45,6 @@ def generate_completion(client, prompt):
 # repeat generate_completion() five times
 for i in range(5):
     generate_completion(
-        client, f"Write a haiku about a duck. ALWAYS RESPOND IN ALL CAPS!"
+        client,
+        f"Create a multiple-choice question about ducks. Provide four answers A to D where one is correct and the others are plausible distractors. Mark the correct answer with an asterisk.",
     )
